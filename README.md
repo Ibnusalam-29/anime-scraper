@@ -21,15 +21,12 @@ Deployment: Vercel Serverless
 
 💻 Cara Menjalankan di Local
 1️⃣ Clone Repository
-git clone https://github.com/USERNAME/anime-portfolio.git
-cd anime-portfolio
-
+git clone https://github.com/USERNAME/anime-scraper.git
+cd anime-scraper
 2️⃣ Install Dependencies
 npm install
-
 3️⃣ Jalankan Server
 npm run dev atau node server.js
-
 Buka di browser:
 http://localhost:3000
 
@@ -42,18 +39,17 @@ vercel login
 vercel
 
 Ikuti instruksi sampai selesai.
+
 ⚙ Konfigurasi Penting (Vercel)
-
 File vercel.json:
-
 {
   "version": 2,
-  "builds": [
-    { "src": "api/index.js", "use": "@vercel/node" }
-  ],
-  "routes": [
+    "builds": [
+      { "src": "api/index.js", "use": "@vercel/node" }
+    ],
+    "routes": [
     { "src": "/(.*)", "dest": "api/index.js" }
-  ]
+    ]
 }
 
 ✨ Fitur Detail
