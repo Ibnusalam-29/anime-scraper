@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= anime.title %></title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header>
+    <a href="/">⬅ Kembali</a>
+    <button onclick="toggleTheme()">Toggle Theme</button>
+</header>
+
+<div class="detail">
+    <img src="<%= anime.images.jpg.image_url %>">
+    <div>
+        <h1><%= anime.title %></h1>
+        <p><strong>Score:</strong> <%= anime.score %></p>
+        <p><%= anime.synopsis %></p>
+    </div>
+</div>
+
+<script src="/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anime App</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header>
+    <h2>🔥 Anime App</h2>
+    <div>
+        <button><a href="/bookmarks">Bookmarks</a></button>
+        <button onclick="toggleTheme()">Toggle Theme</button>
+    </div>
+</header>
+
+<div class="container" id="anime-container">
+    <% animes.forEach(anime => { %>
+        <div class="card">
+            <img src="<%= anime.images.jpg.image_url %>">
+            <h4><%= anime.title %></h4>
+            <p>⭐ <%= anime.score %></p>
+            <a href="/anime/<%= anime.mal_id %>">Detail</a>
+            <button class="bookmark"
+                onclick="addBookmark('<%= anime.mal_id %>', '<%= anime.title %>', '<%= anime.images.jpg.image_url %>')">
+                Bookmark
+            </button>
+        </div>
+    <% }) %>
+</div>
+
+<script src="/script.js"></script>
+</body>
+</html>
