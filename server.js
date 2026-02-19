@@ -1,8 +1,3 @@
-/**
- * File utama aplikasi
- * Bertugas menjalankan server
- */
-
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
@@ -12,20 +7,21 @@ const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 
-// Set template engine
+// Set view engine
 app.set("view engine", "ejs");
 
-// Set folder static
-app.use(express.static("public"));
+// Set folder views secara eksplisit
+app.set("views", path.join(__dirname, "views"));
 
-// Gunakan routes
+// Static folder
+app.use(express.static(path.join(__dirname, "public")));
+
+// Routes
 app.use("/", animeRoutes);
 
-// Gunakan error handler
+// Error handler
 app.use(errorHandler);
 
-// Jalankan server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server berjalan di http://localhost:${PORT}`);
-});
+// JANGAN pakai app.listen()
+
+module.exports = app;
