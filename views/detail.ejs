@@ -1,25 +1,125 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title><%= anime.title %></title>
-    <link rel="stylesheet" href="/style.css">
-</head>
-<body>
+    <head>
+        <title><%= anime.title %></title>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
 
-<header>
-    <a href="/">⬅ Kembali</a>
-    <button onclick="toggleTheme()">Toggle Theme</button>
-</header>
+    <header>
+        <a href="/">⬅ Kembali</a>
+        <button id="dark-mode-toggle" style="background:none; border:none; font-size:20px; cursor:pointer;">🌙</button>
+    </header>
 
-<div class="detail">
-    <img src="<%= anime.images.jpg.image_url %>">
-    <div>
-        <h1><%= anime.title %></h1>
-        <p><strong>Score:</strong> <%= anime.score %></p>
-        <p><%= anime.synopsis %></p>
+    <div class="detail">
+        <img src="<%= anime.images.jpg.image_url %>">
+        <div>
+            <h1><%= anime.title %></h1>
+            <p><strong>Score:</strong> <%= anime.score %></p>
+            <p><%= anime.synopsis %></p>
+            <p><strong>Total Episodes:</strong> <%= anime.episodes || "Unknown" %></p>
+        </div>
     </div>
-</div>
 
-<script src="/script.js"></script>
-</body>
+    <hr>
+
+    <h2 style="padding-left:20px;">Episode List</h2>
+
+    <div id="episode-container"></div>
+
+    <div id="loading" style="text-align:center; padding:20px; display:none;">
+        Loading episodes...
+    </div>
+
+    <div id="end-message" style="text-align:center; padding:20px; display:none;">
+        🎉 Semua episode sudah ditampilkan
+    </div>
+
+    <script>
+    let currentPage = 1;
+    let hasNextPage = true;
+    let loading = false;
+
+    const animeId = "<%= anime.mal_id %>";
+    const container = document.getElementById("episode-container");
+    const loadingEl = document.getElementById("loading");
+    const endMessage = document.getElementById("end-message");
+    const darkModeToggle = document.getElementById("dark-mode-toggle");
+
+    // Dark mode toggle
+    if (localStorage.getItem("dark-mode") === "enabled") {
+        document.body.style.backgroundColor = "#1a1a1a";
+        document.body.style.color = "#fff";
+        darkModeToggle.textContent = "☀️";
+    }
+
+    darkModeToggle.addEventListener("click", () => {
+        if (document.body.style.backgroundColor === "rgb(26, 26, 26)") {
+            document.body.style.backgroundColor = "#fff";
+            document.body.style.color = "#000";
+            darkModeToggle.textContent = "🌙";
+            localStorage.setItem("dark-mode", "disabled");
+        } else {
+            document.body.style.backgroundColor = "#1a1a1a";
+            document.body.style.color = "#fff";
+            darkModeToggle.textContent = "☀️";
+            localStorage.setItem("dark-mode", "enabled");
+        }
+    });
+
+    async function loadEpisodes() {
+
+        if (!hasNextPage || loading) return;
+
+        loading = true;
+        loadingEl.style.display = "block";
+
+        try {
+            const response = await fetch(`/anime/${animeId}/episodes?page=${currentPage}`);
+            const data = await response.json();
+
+            if (data.success && data.episodes.length > 0) {
+
+                data.episodes.forEach(ep => {
+                    const card = document.createElement("div");
+                    card.className = "episode-card";
+
+                    card.innerHTML = `
+                        <h4>Episode ${ep.mal_id}</h4>
+                        <p>${ep.title || "No Title Available"}</p>
+                    `;
+
+                    container.appendChild(card);
+                });
+
+                hasNextPage = data.pagination.has_next_page;
+                currentPage++;
+
+            } else {
+                hasNextPage = false;
+            }
+
+            if (!hasNextPage) {
+                endMessage.style.display = "block";
+            }
+
+        } catch (error) {
+            console.error("Error loading episodes:", error);
+        }
+
+        loading = false;
+        loadingEl.style.display = "none";
+    }
+
+    window.addEventListener("scroll", () => {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+            loadEpisodes();
+        }
+    });
+
+    // Load first page
+    loadEpisodes();
+    </script>
+
+    </body>
 </html>

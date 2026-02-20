@@ -1,51 +1,24 @@
-// File ini berisi semua logic pengambilan data anime
-// Jadi controller tidak langsung akses API
+const axios = require("axios");
 
-const axios = require("../config/axios");
-const NodeCache = require("node-cache");
+const BASE_URL = "https://api.jikan.moe/v4";
 
-// Membuat cache dengan TTL 10 menit
-const cache = new NodeCache({ stdTTL: 600 });
+exports.getTopAnime = async (page = 1) => {
+    const response = await axios.get(`${BASE_URL}/top/anime?page=${page}`);
+    return response.data.data;
+};
 
-/**
- * Mengambil top anime berdasarkan halaman
- */
-async function getTopAnime(page = 1) {
-    const cacheKey = `topAnime-${page}`;
+exports.getAnimeDetail = async (id) => {
+    const response = await axios.get(`${BASE_URL}/anime/${id}`);
+    return response.data.data;
+};
 
-    // Cek apakah data ada di cache
-    if (cache.has(cacheKey)) {
-        return cache.get(cacheKey);
-    }
+exports.getAnimeEpisodes = async (id, page = 1) => {
+    const response = await axios.get(
+        `${BASE_URL}/anime/${id}/episodes?page=${page}`
+    );
 
-    const response = await axios.get(`/top/anime?page=${page}`);
-    const data = response.data.data;
-
-    // Simpan ke cache
-    cache.set(cacheKey, data);
-
-    return data;
-}
-
-/**
- * Mengambil detail anime berdasarkan ID
- */
-async function getAnimeDetail(id) {
-    const cacheKey = `animeDetail-${id}`;
-
-    if (cache.has(cacheKey)) {
-        return cache.get(cacheKey);
-    }
-
-    const response = await axios.get(`/anime/${id}`);
-    const data = response.data.data;
-
-    cache.set(cacheKey, data);
-
-    return data;
-}
-
-module.exports = {
-    getTopAnime,
-    getAnimeDetail
+    return {
+        episodes: response.data.data,
+        pagination: response.data.pagination
+    };
 };

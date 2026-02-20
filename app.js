@@ -1,50 +1,31 @@
+require("dotenv").config();
 const express = require("express");
-const axios = require("axios");
+const path = require("path");
 
 const app = express();
 
+const animeRoutes = require("./routes/animeRoutes");
+const errorHandler = require("./middleware/errorHandler");
+
+// View engine
 app.set("view engine", "ejs");
-app.use(express.static("public"));
+app.set("views", path.join(__dirname, "views"));
 
-// HOME (dengan page)
-app.get("/", async (req, res) => {
-    const page = req.query.page || 1;
+// Static
+app.use(express.static(path.join(__dirname, "public")));
 
-    try {
-        const response = await axios.get(
-            `https://api.jikan.moe/v4/top/anime?page=${page}`
-        );
+// Routes
+app.use("/", animeRoutes);
 
-        res.render("index", {
-            animes: response.data.data,
-            page: page
-        });
-    } catch (err) {
-        res.send("Error mengambil data");
-    }
-});
+// Error handler
+app.use(errorHandler);
 
-// DETAIL
-app.get("/anime/:id", async (req, res) => {
-    try {
-        const response = await axios.get(
-            `https://api.jikan.moe/v4/anime/${req.params.id}`
-        );
+// Jalankan server (untuk local)
+if (require.main === module) {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server jalan di http://localhost:${PORT}`);
+    });
+}
 
-        res.render("detail", {
-            anime: response.data.data
-        });
-    } catch (err) {
-        res.send("Anime tidak ditemukan");
-    }
-});
-
-// HALAMAN BOOKMARK
-app.get("/bookmarks", (req, res) => {
-    res.render("bookmarks");
-});
-
-
-app.listen(3000, () => {
-    console.log("Server jalan di http://localhost:3000");
-});
+module.exports = app;

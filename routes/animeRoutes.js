@@ -1,12 +1,9 @@
-// File ini hanya mengatur routing
-// Logic tetap dipisahkan ke service
-
 const express = require("express");
 const router = express.Router();
 const animeService = require("../services/animeService");
 
 /**
- * Route Home - Menampilkan top anime
+ * Home - Top Anime
  */
 router.get("/", async (req, res, next) => {
     try {
@@ -20,19 +17,46 @@ router.get("/", async (req, res, next) => {
 });
 
 /**
- * Route Detail Anime
+ * Detail Anime
  */
 router.get("/anime/:id", async (req, res, next) => {
     try {
         const anime = await animeService.getAnimeDetail(req.params.id);
-        res.render("detail", { anime });
+
+        res.render("detail", {
+            anime
+        });
+
     } catch (error) {
         next(error);
     }
 });
 
 /**
- * Route Halaman Bookmark
+ * API Episodes (AJAX Infinite Scroll)
+ */
+router.get("/anime/:id/episodes", async (req, res, next) => {
+    try {
+        const page = req.query.page || 1;
+
+        const result = await animeService.getAnimeEpisodes(
+            req.params.id,
+            page
+        );
+
+        res.json({
+            success: true,
+            episodes: result.episodes || [],
+            pagination: result.pagination || {}
+        });
+
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * Bookmark Page
  */
 router.get("/bookmarks", (req, res) => {
     res.render("bookmarks");
